@@ -1,8 +1,13 @@
 ### docker_paddlex_inference
 
-- install requirements.txt
+- cpu install
 ````shell
 pip install -r requirements.txt
+````
+
+- gpu install
+````shell
+pip install -r requirements-gpu.txt
 ````
 
 - run
