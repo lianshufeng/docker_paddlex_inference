@@ -7,5 +7,8 @@ Add ./ /infer
 # 安装依赖
 RUN pip install -r /infer/requirements.txt
 
+# 工作目录
+WORKDIR /infer
+
 # 运行服务
 CMD ["python","src/ApplicationMain.py"]
