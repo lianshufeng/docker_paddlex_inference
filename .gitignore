@@ -1,0 +1,19 @@
+# IDE specific files
+/.idea/
+*.iml
+*.log
+*.gz
+
+# log
+/logs/
+
+
+
+# best_model
+/best_model/
+
+# output
+/output/
+
+# python
+__pycache__
