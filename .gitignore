@@ -11,6 +11,7 @@
 
 # best_model
 /best_model/
+/inference_model/
 
 # output
 /output/

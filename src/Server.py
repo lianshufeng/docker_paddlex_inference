@@ -18,7 +18,8 @@ _workspace = os.path.join(os.path.dirname(__file__), '..')
 # 初始化Server
 server = flask.Flask(__name__)
 # 预测模型加载
-model = pdx.load_model(os.path.join(_workspace, 'best_model'))
+# model = pdx.load_model(os.path.join(_workspace, 'best_model'))
+predictor = pdx.deploy.Predictor(os.path.join(_workspace, 'inference_model'))
 
 
 # server
@@ -39,9 +40,9 @@ def image():
     file = flask.request.files.get('file')
 
     # 门槛
-    threshold = request.values.get('threshold', 0.5)
+    threshold = float(request.values.get('threshold', 0.5))
     # 是否可视化
-    visualize = request.values.get('visualize', True)
+    visualize = True if request.values.get('visualize', 'true') == 'true' else False
 
     imageBuffer = None
     buffer = None
@@ -60,7 +61,7 @@ def image():
     tmpOutput = tempfile.TemporaryDirectory(str(uuid.uuid1()))
 
     # 预测
-    result = model.predict(buffer)
+    result = predictor.predict(buffer)
     resultImage = None
 
     # 可视化保存
@@ -77,6 +78,8 @@ def image():
         file = open(fileName, 'br')
         resultImage = io.BytesIO(file.read())
         file.close()
+    else:
+        resultImage = io.BytesIO()
 
     # 构建响应
     response = make_response(send_file(
@@ -88,4 +91,3 @@ def image():
     response.headers['predict'] = json.dumps(result, ensure_ascii=False)
     return response
 
-    # return json.dumps({'code': 200, 'message': 'ok', 'ret': 123}, ensure_ascii=False)
