@@ -84,8 +84,7 @@ def image():
     # 构建响应
     response = make_response(send_file(
         resultImage,
-        mimetype='image/jpeg',
-        attachment_filename='result.jpg'
+        mimetype='image/jpeg'
     ))
     # 预测结果
     response.headers['predict'] = json.dumps(result, ensure_ascii=False)

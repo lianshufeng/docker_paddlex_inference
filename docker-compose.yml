@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  infer:
+    image: lianshufeng/paddlex_inference
+    volumes:
+      - "./log:/infer/log"
+      - "./inference_model:/infer/inference_model"
+    ports:
+      - "9999:8888"
+    container_name: infer
+    restart: always
