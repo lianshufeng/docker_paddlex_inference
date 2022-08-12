@@ -21,6 +21,11 @@ server = flask.Flask(__name__)
 # model = pdx.load_model(os.path.join(_workspace, 'best_model'))
 predictor = pdx.deploy.Predictor(os.path.join(_workspace, 'inference_model'))
 
+import ctypes, platform
+def malloc_trim():
+    if platform.system().lower() == 'linux':
+        ctypes.CDLL('libc.so.6').malloc_trim(0)
+
 
 # server
 class Server():
@@ -88,5 +93,7 @@ def image():
     ))
     # 预测结果
     response.headers['predict'] = json.dumps(result, ensure_ascii=False)
-    return response
 
+    # 释放内存
+    malloc_trim()
+    return response
