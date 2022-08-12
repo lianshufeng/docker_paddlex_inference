@@ -10,3 +10,10 @@ services:
       - "9999:8888"
     container_name: infer
     restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
