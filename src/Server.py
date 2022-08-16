@@ -1,16 +1,18 @@
 # 推理类
 
-import os, io, uuid
-from PIL import Image
-import flask, json
+import io
+import os
+import urllib.request as httpclient
+
 import cv2
+import flask
+import json
 import numpy as np
 import paddlex as pdx
-import urllib.request as httpclient
-import tempfile
+from flask import make_response
 from flask import request
 from flask import send_file
-from flask import make_response
+from paddlex.cv.models.utils.visualize import draw_bbox_mask
 
 # 工作空间
 _workspace = os.path.join(os.path.dirname(__file__), '..')
@@ -18,10 +20,11 @@ _workspace = os.path.join(os.path.dirname(__file__), '..')
 # 初始化Server
 server = flask.Flask(__name__)
 # 预测模型加载
-# model = pdx.load_model(os.path.join(_workspace, 'best_model'))
 predictor = pdx.deploy.Predictor(os.path.join(_workspace, 'inference_model'))
 
 import ctypes, platform
+
+
 def malloc_trim():
     if platform.system().lower() == 'linux':
         ctypes.CDLL('libc.so.6').malloc_trim(0)
@@ -62,27 +65,15 @@ def image():
     if buffer is None:
         return json.dumps({'code': 500, 'message': 'url or file not null', 'ret': None}, ensure_ascii=False)
 
-    # 构建临时目录
-    tmpOutput = tempfile.TemporaryDirectory(str(uuid.uuid1()))
-
     # 预测
     result = predictor.predict(buffer)
     resultImage = None
 
     # 可视化保存
     if visualize == True:
-        tmpPath = tmpOutput.name
-        pdx.det.visualize(buffer, result, threshold=threshold, save_dir=tmpPath)
-        for file in os.listdir(tmpPath):
-            break
-
-        # frame = cv2.imread(fileName)
-        # resultImage = io.BytesIO(cv2.imencode('.jpg', frame)[1])
-
-        fileName = os.path.join(tmpPath, file)
-        file = open(fileName, 'br')
-        resultImage = io.BytesIO(file.read())
-        file.close()
+        resultImage = draw_bbox_mask(buffer, result, threshold=threshold)
+        resultImage = cv2.imencode('.jpg', resultImage)[1]
+        resultImage = io.BytesIO(resultImage.tobytes())
     else:
         resultImage = io.BytesIO()
 
