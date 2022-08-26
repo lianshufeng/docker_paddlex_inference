@@ -4,14 +4,21 @@ import threading
 import cv2
 import paddlex as pdx
 from paddlex.cv.models.utils.visualize import draw_bbox_mask
+import paddle
 
 # 工作空间
 _workspace = os.path.join(os.path.dirname(__file__), '..')
 
 # model = pdx.load_model(os.path.join(_workspace, 'best_model'))
-predictor = pdx.deploy.Predictor(os.path.join(_workspace, 'inference_model'))
+useGpu = int(paddle.device.cuda.device_count()) > 0
+print('Enable GPU: ' + str(useGpu))
+predictor = pdx.deploy.Predictor(model_dir=os.path.join(_workspace, 'inference_model'), use_gpu=useGpu)
 
 frameBuffer = None
+
+import paddle
+
+paddle.utils.run_check()
 
 
 def worker():

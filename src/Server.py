@@ -13,6 +13,7 @@ from flask import make_response
 from flask import request
 from flask import send_file
 from paddlex.cv.models.utils.visualize import draw_bbox_mask
+import paddle
 
 # 工作空间
 _workspace = os.path.join(os.path.dirname(__file__), '..')
@@ -20,7 +21,9 @@ _workspace = os.path.join(os.path.dirname(__file__), '..')
 # 初始化Server
 server = flask.Flask(__name__)
 # 预测模型加载
-predictor = pdx.deploy.Predictor(os.path.join(_workspace, 'inference_model'))
+useGpu = paddle.device.cuda.device_count() > 0
+print('Enable GPU: ' + str(useGpu))
+predictor = pdx.deploy.Predictor(model_dir=os.path.join(_workspace, 'inference_model'), use_gpu=useGpu)
 
 import ctypes, platform
 
